@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Offre } from "@/types/offre";
+import { Offre } from "@/types/Offre";
 
 const OFFRES: Offre[] = [
     { id: "1", intitule: "Développeur Frontend" },

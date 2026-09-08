@@ -1,5 +1,5 @@
-import { Offre } from "@/types/offre";
 import Link from "next/link";
+import { Offre } from "@/types/Offre";
 
 const OFFRES: Offre[] = [
   {
