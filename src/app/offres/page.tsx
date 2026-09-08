@@ -1,7 +1,5 @@
-type Offre = {
-  id: string;
-  intitule: string;
-};
+import { Offre } from "@/types/offre";
+import Link from "next/link";
 
 const OFFRES: Offre[] = [
   {
@@ -20,7 +18,9 @@ export default function Page() {
             <h1>Offres d'emploi</h1>
             <ul>
                 {OFFRES.map((offre) => (
-                    <li key={offre.id}>{offre.intitule}</li>
+                    <li key={offre.id}>
+                        <Link href={`/offres/${offre.id}`}>{offre.intitule}</Link>
+                    </li>
                 ))}
             </ul>
         </main>
