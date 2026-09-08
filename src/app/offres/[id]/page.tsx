@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
 import { Offre } from "@/types/Offre";
+import {notFound} from "next/navigation";
 
 const OFFRES: Offre[] = [
     { id: "1", intitule: "Développeur Frontend" },
@@ -16,7 +16,7 @@ export default async function Page({params,}: { params: Promise<{ id: string }>;
 
     return (
         <div>
-            <h1>{offre.intitule}</h1>
+            <h1>{offre!.intitule}</h1>
         </div>
     );
 }
