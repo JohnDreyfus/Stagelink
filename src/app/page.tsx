@@ -60,7 +60,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Coucou c'est John
+            Coucou c&apos;est John
           </a>
         </div>
       </main>
