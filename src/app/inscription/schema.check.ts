@@ -48,6 +48,8 @@ const confirmation = Inscription.safeParse({
 assert.ok(!confirmation.success, "une confirmation différente échoue");
 assert.deepEqual(confirmation.error.issues[0].path, ["confirmation"]);
 
-assert.ok(!Inscription.safeParse(compte).success, "sans type de compte, échec");
+const sansRole = Inscription.safeParse(compte);
+assert.ok(!sansRole.success, "sans type de compte, échec");
+assert.deepEqual(sansRole.error.issues[0].path, ["role"]);
 
 console.log("inscription : OK");
