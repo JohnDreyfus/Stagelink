@@ -1,0 +1,139 @@
+// StageLink — schéma de données
+// Prisma 7 : l'URL de connexion n'est plus ici, elle est dans prisma7.config.ts
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────── utilisateurs ──
+
+enum Role {
+  ETUDIANT
+  TUTEUR
+  COORDINATEUR
+}
+
+model Utilisateur {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  motDePasse String
+  nom        String
+  prenom     String
+  role       Role
+  creeLe     DateTime @default(now())
+
+  etudiant Etudiant?
+  tuteur   Tuteur?
+}
+
+model Etudiant {
+  id            String @id @default(cuid())
+  utilisateurId String @unique
+  promotion     String
+
+  utilisateur  Utilisateur   @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  candidatures Candidature[]
+  documents    Document[]
+}
+
+model Tuteur {
+  id            String @id @default(cuid())
+  utilisateurId String @unique
+  fonction      String
+  entrepriseId  String
+
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  entreprise  Entreprise  @relation(fields: [entrepriseId], references: [id])
+  offres      Offre[]
+}
+
+// ───────────────────────────────────────────────────── entreprises, offres ──
+
+model Entreprise {
+  id      String @id @default(cuid())
+  nom     String
+  ville   String
+  secteur String
+
+  tuteurs Tuteur[]
+  offres  Offre[]
+}
+
+model Offre {
+  id           String   @id @default(cuid())
+  intitule     String
+  description  String
+  ville        String
+  dateLimite   DateTime
+  places       Int      @default(1)
+  publiee      Boolean  @default(false)
+  creeLe       DateTime @default(now())
+  entrepriseId String
+  tuteurId     String?
+
+  entreprise   Entreprise    @relation(fields: [entrepriseId], references: [id])
+  tuteur       Tuteur?       @relation(fields: [tuteurId], references: [id])
+  candidatures Candidature[]
+
+  @@index([publiee, dateLimite])
+}
+
+// ────────────────────────────────────────────── candidatures et conventions ──
+
+enum StatutCandidature {
+  DEPOSEE
+  EN_ENTRETIEN
+  ACCEPTEE
+  REFUSEE
+}
+
+model Candidature {
+  id         String            @id @default(cuid())
+  motivation String
+  statut     StatutCandidature @default(DEPOSEE)
+  deposeeLe  DateTime          @default(now())
+  etudiantId String
+  offreId    String
+
+  etudiant   Etudiant    @relation(fields: [etudiantId], references: [id], onDelete: Cascade)
+  offre      Offre       @relation(fields: [offreId], references: [id], onDelete: Cascade)
+  convention Convention?
+
+  // un étudiant ne peut postuler qu'une fois à la même offre
+  @@unique([etudiantId, offreId])
+}
+
+model Convention {
+  id            String   @id @default(cuid())
+  candidatureId String   @unique
+  dateDebut     DateTime
+  dateFin       DateTime
+  signee        Boolean  @default(false)
+
+  candidature Candidature @relation(fields: [candidatureId], references: [id], onDelete: Cascade)
+  visites     Visite[]
+}
+
+model Visite {
+  id           String   @id @default(cuid())
+  conventionId String
+  date         DateTime
+  compteRendu  String?
+
+  convention Convention @relation(fields: [conventionId], references: [id], onDelete: Cascade)
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  etudiantId String
+  nom        String
+  type       String
+  deposeLe   DateTime @default(now())
+
+  etudiant Etudiant @relation(fields: [etudiantId], references: [id], onDelete: Cascade)
+}

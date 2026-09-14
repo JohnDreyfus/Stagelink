@@ -1,22 +1,35 @@
-import { Offre } from "@/types/Offre";
-import {notFound} from "next/navigation";
+import { notFound } from "next/navigation";
 
-const OFFRES: Offre[] = [
-    { id: "1", intitule: "Développeur Frontend" },
-    { id: "2", intitule: "Développeur Backend" },
-];
+import { consulterOffre } from "@/lib/services/offres";
 
-export default async function Page({params,}: { params: Promise<{ id: string }>; }) {
+export default async function Page({
+                                       params,
+                                   }: {
+    params: Promise<{ id: string }>;
+}) {
     const { id } = await params;
-    const offre = OFFRES.find((o) => o.id === id);
+    const resultat = await consulterOffre(id);
 
-    if (!offre) {
-        notFound();
-    }
+    // notFound() a le type never : après cette ligne, TypeScript sait que
+    // resultat n'est plus null. Plus besoin du point d'exclamation.
+    if (!resultat) notFound();
+
+    const { offre, ouverte } = resultat;
 
     return (
-        <div>
-            <h1>{offre!.intitule}</h1>
-        </div>
+        <main className="p-8">
+            <h1 className="text-2xl font-bold">{offre.intitule}</h1>
+            <p className="text-slate-600">
+                {offre.entreprise} — {offre.ville}
+            </p>
+
+            {!ouverte && (
+                <p className="mt-4 rounded border border-amber-300 bg-amber-50 p-3">
+                    Cette offre n&apos;accepte plus de candidature.
+                </p>
+            )}
+
+            <p className="mt-4">{offre.description}</p>
+        </main>
     );
 }

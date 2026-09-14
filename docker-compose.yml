@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:18
+    container_name: stagelink-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: stagelink
+      POSTGRES_PASSWORD: stagelink
+      POSTGRES_DB: stagelink
+    ports:
+      - "5432:5432"
+    volumes:
+      - donnees-postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stagelink -d stagelink"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: stagelink-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@stagelink.dev
+      PGADMIN_DEFAULT_PASSWORD: stagelink
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - donnees-pgadmin:/var/lib/pgadmin
+
+volumes:
+  donnees-postgres:
+  donnees-pgadmin:
