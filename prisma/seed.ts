@@ -4,6 +4,10 @@
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { hacherMotDePasse } from "../src/lib/mot-de-passe";
+
+// Mot de passe de démonstration, le même pour tous les comptes : "motdepasse".
+const motDePasse = hacherMotDePasse("motdepasse");
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
@@ -46,7 +50,7 @@ async function main() {
       utilisateur: {
         create: {
           email: "c.leroy@naonis.fr",
-          motDePasse: "a-remplacer",
+          motDePasse,
           nom: "Leroy",
           prenom: "Camille",
           role: "TUTEUR",
@@ -62,7 +66,7 @@ async function main() {
       utilisateur: {
         create: {
           email: "s.morvan@brevia.fr",
-          motDePasse: "a-remplacer",
+          motDePasse,
           nom: "Morvan",
           prenom: "Sofiane",
           role: "TUTEUR",
@@ -78,7 +82,7 @@ async function main() {
       utilisateur: {
         create: {
           email: "lea.bertin@etu.fr",
-          motDePasse: "a-remplacer",
+          motDePasse,
           nom: "Bertin",
           prenom: "Léa",
           role: "ETUDIANT",
@@ -93,7 +97,7 @@ async function main() {
       utilisateur: {
         create: {
           email: "yanis.oubella@etu.fr",
-          motDePasse: "a-remplacer",
+          motDePasse,
           nom: "Oubella",
           prenom: "Yanis",
           role: "ETUDIANT",
@@ -106,7 +110,7 @@ async function main() {
   await prisma.utilisateur.create({
     data: {
       email: "coordination@lycee.fr",
-      motDePasse: "a-remplacer",
+      motDePasse,
       nom: "Dreyfus",
       prenom: "John",
       role: "COORDINATEUR",

@@ -1,5 +1,8 @@
 import "server-only";
 
+import { getServerSession } from "next-auth/next";
+
+import { authOptions } from "@/lib/auth";
 import {
   aDejaPostule,
   creerCandidature,
@@ -20,12 +23,20 @@ import type {
  */
 
 /**
- * L'étudiant connecté.
- * Tant qu'il n'y a pas d'authentification, il est écrit ici — à UN seul
- * endroit, pour que le module 04 n'ait qu'une ligne à remplacer.
+ * L'e-mail de l'utilisateur connecté, lu dans la session NextAuth.
  * Il n'est JAMAIS transmis par le formulaire : voir l'étape 13.
+ * C'est ici que se fait la vraie vérification : sans session, aucun étudiant.
  */
-const EMAIL_ETUDIANT_CONNECTE = "yanis.oubella@etu.fr";
+async function emailConnecte(): Promise<string | null> {
+  const session = await getServerSession(authOptions);
+  return session?.user?.email ?? null;
+}
+
+/** L'identifiant de l'étudiant connecté, ou null s'il n'y en a pas. */
+async function etudiantConnecte(): Promise<string | null> {
+  const email = await emailConnecte();
+  return email ? trouverEtudiantParEmail(email) : null;
+}
 
 /** Les raisons pour lesquelles une candidature peut être refusée. */
 export type RefusCandidature =
@@ -44,7 +55,7 @@ function extraire(texte: string, taille = 90): string {
 
 /** Les candidatures de l'étudiant connecté, les plus récentes d'abord. */
 export async function listerMesCandidatures(): Promise<CandidatureResume[]> {
-  const etudiantId = await trouverEtudiantParEmail(EMAIL_ETUDIANT_CONNECTE);
+  const etudiantId = await etudiantConnecte();
   if (!etudiantId) return [];
 
   const lignes = await listerCandidaturesDe(etudiantId);
@@ -71,7 +82,7 @@ export async function postuler(
   offreId: string,
   motivation: string,
 ): Promise<{ ok: true; id: string } | { ok: false; raison: RefusCandidature }> {
-  const etudiantId = await trouverEtudiantParEmail(EMAIL_ETUDIANT_CONNECTE);
+  const etudiantId = await etudiantConnecte();
   if (!etudiantId) return { ok: false, raison: "offre-introuvable" };
 
   const offre = await lireOffre(offreId);
@@ -91,7 +102,7 @@ export async function postuler(
 export async function retirerMaCandidature(
   candidatureId: string,
 ): Promise<boolean> {
-  const etudiantId = await trouverEtudiantParEmail(EMAIL_ETUDIANT_CONNECTE);
+  const etudiantId = await etudiantConnecte();
   if (!etudiantId) return false;
 
   const supprimees = await supprimerCandidatureDe(candidatureId, etudiantId);
