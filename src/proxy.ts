@@ -8,7 +8,7 @@ import { withAuth } from "next-auth/middleware";
  * Le proxy ne fait que rediriger vers la connexion ; la vraie protection
  * reste dans le service, car les Server Actions peuvent contourner le proxy.
  */
-const PAGES_PUBLIQUES = ["/", "/offres"];
+const PAGES_PUBLIQUES = ["/", "/offres", "/inscription"];
 
 export default withAuth({
   callbacks: {

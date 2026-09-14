@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import { getServerSession } from "next-auth/next";
 
 import { authOptions } from "@/lib/auth";
@@ -41,10 +42,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
               </a>
             </>
           ) : (
-            // eslint-disable-next-line @next/next/no-html-link-for-pages
-            <a href="/api/auth/signin" className="underline">
-              Connexion
-            </a>
+            <>
+              <Link href="/inscription" className="underline">
+                Créer un compte
+              </Link>
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+              <a href="/api/auth/signin" className="underline">
+                Connexion
+              </a>
+            </>
           )}
         </header>
         {children}
